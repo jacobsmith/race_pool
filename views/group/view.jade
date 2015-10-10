@@ -1,4 +1,14 @@
 extends ../layout
 
 block content
-  h3 Group!
+  h3 #{group.name}
+    h4 Prizes
+    ul.list-group
+      li.list-group-item First Place: #{group.prizes.first}
+      li.list-group-item Second Place: #{group.prizes.second}
+      li.list-group-item Third Place: #{group.prizes.third}
+      li.list-group-item Last Place: #{group.prizes.last}
+    h4 Members
+    ul.list-group
+      - for user in group.users
+        li.list-group-item #{user.profile.name}

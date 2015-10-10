@@ -30,7 +30,11 @@ exports.joinGroup = function(req, res) {
 };
 
 exports.viewGroup = function(req, res) {
-  res.render('group/view');
+  var groupId = req.params.groupId;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    res.render('group/view', {group: group});
+  });
 };
 
 exports.postGroup = function(req, res) {

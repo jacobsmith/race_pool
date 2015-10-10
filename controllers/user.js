@@ -24,6 +24,7 @@ exports.getLogin = function(req, res) {
 exports.postLogin = function(req, res, next) {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
+  req.assert('name', 'Password cannot be blank').notEmpty();
 
   var errors = req.validationErrors();
 
@@ -84,7 +85,8 @@ exports.postSignup = function(req, res, next) {
 
   var user = new User({
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    profile: {name: req.body.name}
   });
 
   User.findOne({ email: req.body.email }, function(err, existingUser) {
