@@ -27,8 +27,10 @@ var sass = require('node-sass-middleware');
  */
 var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
+var groupController = require('./controllers/group');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
+var raceStatus = require('./controllers/raceStatus');
 
 /**
  * API keys and Passport configuration.
@@ -115,6 +117,13 @@ app.post('/account/profile', passportConf.isAuthenticated, userController.postUp
 app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
+
+app.get('/group', groupController.getGroups);
+app.get('/group/new', groupController.newGroup);
+app.post('/group/new', groupController.postGroup);
+
+
+app.get('/raceStatus', raceStatus.getCurrentSnapshot);
 
 /**
  * API examples routes.

@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+  h3 Your Groups
+  .ul.list-group
+    - for group in groups
+      .li.list-group-item
+        = group.name
+          .ul
+            - for user in group.users
+              .li.list-group-item
+                = user.profile.name
