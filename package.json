@@ -54,6 +54,7 @@
     "passport-oauth": "^1.0.0",
     "passport-twitter": "^1.0.3",
     "paypal-rest-sdk": "^1.6.3",
+    "q": "^1.4.1",
     "request": "^2.64.0",
     "serve-favicon": "^2.3.0",
     "stripe": "^4.0.0",
