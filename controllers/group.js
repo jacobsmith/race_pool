@@ -20,7 +20,8 @@ exports.joinGroup = function(req, res) {
       return res.redirect('/group');
     }
 
-    if (group.users.indexOf(user) === -1) {
+    // turn the Binary Json (BSON) format of mongo into a string to compare
+    if (_.map(group.users, function(user) { return user._id.toString(); }).indexOf(user.id) === -1) {
       group.users.push(req.user);
       group.save();
     }
