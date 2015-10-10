@@ -6,9 +6,31 @@ var secrets = require('../config/secrets');
 
 exports.getGroups = function(req, res) {
   Group.find().exec(function (err, groups) {
-    console.log('USERS: ', groups[0].users);
     res.render('group/index', {groups: groups});
   });
+};
+
+exports.joinGroup = function(req, res) {
+  var groupId = req.params.groupId;
+  var user = req.user;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    if (_.isEmpty(group)) {
+      req.flash('errors', { msg: 'Cannot find a group with that id.'});
+      return res.redirect('/group');
+    }
+
+    if (group.users.indexOf(user) === -1) {
+      group.users.push(req.user);
+      group.save();
+    }
+
+    res.redirect('/group/' + groupId);
+  });
+};
+
+exports.viewGroup = function(req, res) {
+  res.render('group/view');
 };
 
 exports.postGroup = function(req, res) {
@@ -25,6 +47,11 @@ exports.postGroup = function(req, res) {
     if (user) {
       var group = new Group({
         name: req.body.name,
+        wager: req.body.wager,
+        firstPlaceWin: req.body.firstPlaceWin,
+        secondPlaceWin: req.body.secondPlaceWin,
+        thirdPlaceWin: req.body.thirdPlaceWin,
+        lastCarRunning: req.body.lastCarRunning,
         users: [user]
       });
 

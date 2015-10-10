@@ -5,7 +5,8 @@ block content
   .ul.list-group
     - for group in groups
       .li.list-group-item
-        = group.name
+        a(href='/group/#{group.id}/join') #{group.name}
+        p First Place: #{group.prizes.first} | Second Place: #{group.prizes.second} | Third Place: #{group.prizes.third} | Last Car Running: #{group.prizes.last}
           .ul
             - for user in group.users
               .li.list-group-item

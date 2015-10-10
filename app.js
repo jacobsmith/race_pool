@@ -121,6 +121,8 @@ app.get('/account/unlink/:provider', passportConf.isAuthenticated, userControlle
 app.get('/group', groupController.getGroups);
 app.get('/group/new', groupController.newGroup);
 app.post('/group/new', groupController.postGroup);
+app.get('/group/:groupId/join', groupController.joinGroup);
+app.get('/group/:groupId', groupController.viewGroup);
 
 
 app.get('/raceStatus', raceStatus.getCurrentSnapshot);
