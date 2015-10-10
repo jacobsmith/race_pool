@@ -5,6 +5,7 @@ var Group = require('../models/Group');
 var secrets = require('../config/secrets');
 var http = require('http');
 var vm = require('vm');
+var Q = require('q');
 
 exports.getStartingPositions = function(req, res) {
   var jsonpSandbox = vm.createContext({jsonCallback: function(r){return r;}});
@@ -34,7 +35,9 @@ exports.getStartingPositions = function(req, res) {
 
 };
 
-exports.getCurrentSnapshot = function(req, res) {
+exports.getCurrentStandings = function() {
+  var deferred = Q.defer();
+
   var jsonpSandbox = vm.createContext({jsonCallback: function(r){return r;}});
 
   var body = '';
@@ -47,7 +50,7 @@ exports.getCurrentSnapshot = function(req, res) {
 
     raceResponse.on('end', function() {
       var response = vm.runInContext(body, jsonpSandbox);
-      res.send(response.timing_results);
+      deferred.resolve(response.timing_results.Item);
     });
   });
 
@@ -56,4 +59,6 @@ exports.getCurrentSnapshot = function(req, res) {
   });
 
   currentStatus.end();
+
+  return deferred.promise;
 };

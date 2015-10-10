@@ -5,11 +5,62 @@ var Group = require('../models/Group');
 var GroupUserDriver = require('../models/GroupUserDriver');
 var secrets = require('../config/secrets');
 var drivers = require('../constants/drivers.js');
+var raceStatus = require('../controllers/raceStatus');
+var q = require('q');
 
 exports.getGroups = function(req, res) {
   Group.find().exec(function (err, groups) {
     res.render('group/index', {groups: groups});
   });
+};
+
+exports.getCurrentStandings = function(req, res) {
+  var groupId = req.params.groupId;
+
+  raceStatus.getCurrentStandings().then(function(drivers) {
+    Group.findOne({_id: groupId}).exec(function(err, group) {
+      if (_.isEmpty(group)) {
+        req.flash('errors', { msg: 'Cannot find a group with that id.'});
+        return res.redirect('/group');
+      }
+
+      GroupUserDriver.find({group: group}).exec(function(err, claimedMappings) {
+        if (err) {
+          console.log('ERROR: ', err);
+        }
+
+        var updatedDrivers = [];
+         async.each(drivers, function(driver) {
+            _.each(claimedMappings, function(claimedMapping) {
+
+                if (parseInt(driver.startPosition) == claimedMapping.driver) {
+                    var user = _.find(group.users, function(user) {
+                      return user._id.toString() == claimedMapping.user.toString();
+                    });
+
+                    driver.user = user.profile.name;
+
+                    if (updatedDrivers.indexOf(driver) === -1) {
+                      updatedDrivers.push(driver);
+                    }
+                } else {
+
+                    if (updatedDrivers.indexOf(driver) === -1) {
+                      updatedDrivers.push(driver);
+                    }
+                }
+            });
+        });
+
+        console.log(updatedDrivers);
+        
+        return res.render('group/currentStanding', {drivers: updatedDrivers});
+      });
+
+    });
+
+  });
+
 };
 
 exports.pickDriver = function(req, res) {
