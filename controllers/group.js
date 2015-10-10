@@ -2,11 +2,84 @@ var _ = require('lodash');
 var async = require('async');
 var User = require('../models/User');
 var Group = require('../models/Group');
+var GroupUserDriver = require('../models/GroupUserDriver');
 var secrets = require('../config/secrets');
+var drivers = require('../constants/drivers.js');
 
 exports.getGroups = function(req, res) {
   Group.find().exec(function (err, groups) {
     res.render('group/index', {groups: groups});
+  });
+};
+
+exports.pickDriver = function(req, res) {
+  var groupId = req.params.groupId;
+  var user = req.user;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    if (_.isEmpty(group)) {
+      req.flash('errors', { msg: 'Cannot find a group with that id.'});
+      return res.redirect('/group');
+    }
+
+    GroupUserDriver.find({group: group}).exec(function(err, claimedMappings) {
+          // GroupUserDriver holds an integer in 'driver' for the driver's starting position
+          var claimedStartPositions = _.map(claimedMappings, 'driver');
+
+          var remainingDrivers = [];
+          for (var i = 0; i < drivers.length; i++) {
+            var currentDriver = drivers[i];
+            if (claimedStartPositions.indexOf(parseInt(currentDriver.startPosition)) > -1) {
+            } else {
+              remainingDrivers.push(currentDriver);
+            }
+          }
+
+          var driver;
+          if (remainingDrivers.length > 0) {
+            var random = _.random(0, remainingDrivers.length-1);
+            driver = remainingDrivers[random];
+          } else {
+            req.flash('errors', { msg: 'All drivers have been taken. Good luck!' });
+            return res.redirect('/group/' + groupId);
+          }
+
+          var groupUserDriver = new GroupUserDriver({
+            user: user,
+            group: group,
+            driver: driver.startPosition
+          });
+
+          groupUserDriver.save(function(err, groupUserDriver) {
+            if (err) {
+              console.log('ERROR: ', err);
+              req.flash('errors', { msg: 'Oops! Something went wrong; please try again.'});
+               return res.redirect('/group/' + groupId);
+            } else {
+              req.flash('success', { msg: 'Congratulations! You have selected ' + driver.firstName + ' ' + driver.lastName  +
+              ' who is staring in position #' + driver.startPosition + '.'
+              });
+               return res.redirect('/group/' + groupId);
+            }
+          });
+    });
+  });
+
+};
+
+exports.closeGroup = function(req, res) {
+  var groupId = req.params.groupId;
+  var user = req.user;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    if (_.isEmpty(group)) {
+      req.flash('errors', { msg: 'Cannot find a group with that id.'});
+      return res.redirect('/group');
+    }
+
+    group.closed = true;
+    group.save();
+    res.redirect('/group/' + groupId);
   });
 };
 

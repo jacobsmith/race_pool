@@ -2,6 +2,15 @@ extends ../layout
 
 block content
   h3 #{group.name}
+    if !group.closed
+      form.form-horizontal(action='/group/#{group.id}/close' id='close-group-form', method='GET')
+        input(type='hidden', name='_csrf', value=_csrf)
+        button.pull-right.btn.btn-default(type="submit") Close Group
+    else
+      form.form-horizontal(action='/group/#{group.id}/pickDriver' id='close-group-form', method='GET')
+        input(type='hidden', name='_csrf', value=_csrf)
+        button.pull-right.btn.btn-default(type="submit") Pick Driver! (Costs: #{group.wager}) 
+
     h4 Prizes
     ul.list-group
       li.list-group-item First Place: #{group.prizes.first}

@@ -7,7 +7,8 @@ var groupSchema = new mongoose.Schema({
   firstPlaceWin: String,
   secondPlaceWin: String,
   thirdPlaceWin: String,
-  lastCarRunning: String
+  lastCarRunning: String,
+  closed: Boolean
 });
 
 groupSchema.virtual('prizes').get(function() {

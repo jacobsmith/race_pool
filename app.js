@@ -123,6 +123,8 @@ app.get('/group/new', groupController.newGroup);
 app.post('/group/new', groupController.postGroup);
 app.get('/group/:groupId/join', groupController.joinGroup);
 app.get('/group/:groupId', groupController.viewGroup);
+app.get('/group/:groupId/close', groupController.closeGroup);
+app.get('/group/:groupId/pickDriver', groupController.pickDriver);
 
 app.get('/race/startingPositions', raceStatus.getStartingPositions);
 
