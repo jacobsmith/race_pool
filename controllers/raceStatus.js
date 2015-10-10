@@ -6,6 +6,34 @@ var secrets = require('../config/secrets');
 var http = require('http');
 var vm = require('vm');
 
+exports.getStartingPositions = function(req, res) {
+  var jsonpSandbox = vm.createContext({jsonCallback: function(r){return r;}});
+
+  var body = '';
+  var currentStatus = http.get('http://corp-erp.cloudapp.net/timingscoring-prerace.json', function(raceResponse) {
+    raceResponse.setEncoding('utf8');
+
+    raceResponse.on('data', function (chunk) {
+      body += chunk;
+    });
+
+    raceResponse.on('end', function() {
+      var response = vm.runInContext(body, jsonpSandbox);
+
+      return res.render('race/startingPositions', {
+        racers: _.sortBy(response.timing_results.Item, 'startingPosition')
+      });
+    });
+  });
+
+  currentStatus.on('error', function(e) {
+    console.log('problem with request: ' + e.message);
+  });
+
+  currentStatus.end();
+
+};
+
 exports.getCurrentSnapshot = function(req, res) {
   var jsonpSandbox = vm.createContext({jsonCallback: function(r){return r;}});
 

@@ -1,0 +1,7 @@
+extends ../layout
+
+block content
+  h4 Starting Positions
+  ul.list-group
+    for racer, index in racers
+      li.list-group-item #{index + 1}. #{racer.firstName} #{racer.lastName} #[span.badge #{racer.no}]

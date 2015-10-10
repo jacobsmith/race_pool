@@ -124,6 +124,7 @@ app.post('/group/new', groupController.postGroup);
 app.get('/group/:groupId/join', groupController.joinGroup);
 app.get('/group/:groupId', groupController.viewGroup);
 
+app.get('/race/startingPositions', raceStatus.getStartingPositions);
 
 app.get('/raceStatus', raceStatus.getCurrentSnapshot);
 
