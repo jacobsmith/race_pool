@@ -17,7 +17,10 @@ exports.getGroups = function(req, res) {
 exports.getCurrentStandings = function(req, res) {
   var groupId = req.params.groupId;
 
-  raceStatus.getCurrentStandings().then(function(drivers) {
+  raceStatus.getCurrentStandings().then(function(response) {
+    var drivers = response.drivers;
+    var status = response.status;
+
     Group.findOne({_id: groupId}).exec(function(err, group) {
       if (_.isEmpty(group)) {
         req.flash('errors', { msg: 'Cannot find a group with that id.'});
@@ -38,7 +41,7 @@ exports.getCurrentStandings = function(req, res) {
                       return user._id.toString() == claimedMapping.user.toString();
                     });
 
-                    driver.user = user.profile.name;
+                    driver.user = user;
 
                     if (updatedDrivers.indexOf(driver) === -1) {
                       updatedDrivers.push(driver);
@@ -52,9 +55,7 @@ exports.getCurrentStandings = function(req, res) {
             });
         });
 
-        console.log(updatedDrivers);
-        
-        return res.render('group/currentStanding', {drivers: updatedDrivers});
+        return res.render('group/currentStanding', {drivers: updatedDrivers, status: status});
       });
 
     });

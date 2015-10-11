@@ -96,6 +96,14 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
+app.all(['/group*', '/race*'],function(req,res,next){
+  if(req.user){
+    next();
+  }else{
+    req.flash('errors', { msg: 'Please sign in.'});
+    return res.redirect('/login');
+  }
+});
 
 /**
  * Primary app routes.

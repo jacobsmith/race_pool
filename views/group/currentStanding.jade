@@ -1,8 +1,10 @@
 extends ../layout
 
 block content
+
+  h3 Lap #{status.lapNumber} / 200 #[i.fa.fa-flag.green]
   h4 Current Positions
   ul.list-group
     for driver, index in drivers
-      - var userName = driver.user ? ' - ' + driver.user : '';
+      - var userName = driver.user ? ' - ' + driver.user.profile.name : '';
       li.list-group-item #{index + 1}. #{driver.firstName} #{driver.lastName} #{userName} #[span.badge #{driver.no}]

@@ -50,7 +50,7 @@ exports.getCurrentStandings = function() {
 
     raceResponse.on('end', function() {
       var response = vm.runInContext(body, jsonpSandbox);
-      deferred.resolve(response.timing_results.Item);
+      deferred.resolve({drivers: response.timing_results.Item, status: response.timing_results.heartbeat });
     });
   });
 
