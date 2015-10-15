@@ -9,7 +9,7 @@ var raceStatus = require('../controllers/raceStatus');
 var q = require('q');
 
 exports.getGroups = function(req, res) {
-  Group.find().exec(function (err, groups) {
+  Group.find().exec().then(function (groups) {
     res.render('group/index', {groups: groups});
   });
 };
@@ -129,6 +129,13 @@ exports.closeGroup = function(req, res) {
       return res.redirect('/group');
     }
 
+    console.log('user: ', user);
+
+    if (group.creatorId != user) {
+      req.flash('errors', { msg: 'Only the creator of a group can choose to close it.'});
+      return res.redirect('/group');
+    }
+
     group.closed = true;
     group.save();
     res.redirect('/group/' + groupId);
@@ -142,6 +149,11 @@ exports.joinGroup = function(req, res) {
   Group.findOne({_id: groupId}).exec(function(err, group) {
     if (_.isEmpty(group)) {
       req.flash('errors', { msg: 'Cannot find a group with that id.'});
+      return res.redirect('/group');
+    }
+
+    if (group.users.length === 33) {
+      req.flash('errors', { msg: 'Sorry, that group is already full! Please join another group or create your own!'});
       return res.redirect('/group');
     }
 
@@ -174,6 +186,7 @@ exports.postGroup = function(req, res) {
   }
 
   User.findOne({_id: req.user.id}).exec(function(err, user) {
+    console.log('creating with user: ', user);
     if (user) {
       var group = new Group({
         name: req.body.name,
@@ -182,7 +195,8 @@ exports.postGroup = function(req, res) {
         secondPlaceWin: req.body.secondPlaceWin,
         thirdPlaceWin: req.body.thirdPlaceWin,
         lastCarRunning: req.body.lastCarRunning,
-        users: [user]
+        users: [user],
+        creatorId: user._id.toString()
       });
 
       group.save(function(err, group) {

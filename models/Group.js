@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var userSchema = require('./User').schema;
 
 var groupSchema = new mongoose.Schema({
   name: String,
@@ -8,7 +9,8 @@ var groupSchema = new mongoose.Schema({
   secondPlaceWin: String,
   thirdPlaceWin: String,
   lastCarRunning: String,
-  closed: Boolean
+  closed: Boolean,
+  creatorId: String
 });
 
 groupSchema.virtual('prizes').get(function() {
