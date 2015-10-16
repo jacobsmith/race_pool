@@ -9,7 +9,8 @@ var raceStatus = require('../controllers/raceStatus');
 var q = require('q');
 
 exports.getGroups = function(req, res) {
-  Group.find().exec().then(function (groups) {
+  currentUser = req.user;
+  Group.find({ users: { $all: currentUser }}).exec().then(function (groups) {
     res.render('group/index', {groups: groups});
   });
 };
@@ -169,9 +170,12 @@ exports.joinGroup = function(req, res) {
 
 exports.viewGroup = function(req, res) {
   var groupId = req.params.groupId;
+  var currentUserId = req.user._id.toString();
+
+  var groupUrl = req.protocol + '://' + req.get('host') + '/group/' + groupId;
 
   Group.findOne({_id: groupId}).exec(function(err, group) {
-    res.render('group/view', {group: group});
+    res.render('group/view', {group: group, currentUserId: currentUserId, groupUrl: groupUrl});
   });
 };
 
