@@ -8,8 +8,18 @@ var drivers = require('../constants/drivers.js');
 var raceStatus = require('../controllers/raceStatus');
 var q = require('q');
 
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+    service: 'Mailgun',
+    auth: {
+        user: secrets.mailgun.user,
+        pass: secrets.mailgun.password
+    }
+});
+
 exports.getGroups = function(req, res) {
   currentUser = req.user;
+  console.log('currentUser: ', currentUser);
   Group.find({ users: { $all: currentUser }}).exec().then(function (groups) {
     res.render('group/index', {groups: groups});
   });
@@ -176,13 +186,34 @@ exports.requestToJoin = function(req, res) {
     if (group.requests.indexOf(userId) == -1) {
       group.requests.push(userId);
       group.save();
+
+      User.find(({_id: { $in: [group.creatorId, userId] }})).exec(function(err, users) {
+        console.log('users: ', users);
+          creator = users[0]._id.toString() === group.creatorId ? users[0] : users[1];
+          requestingUser = creator === users[0] ? users[1] : users[0];
+          sendPendingRequestEmailToCreator(creator, requestingUser);
+      });
     }
   });
 
-  // TODO: email group creator someone wants in!
-
   req.flash('success', { msg: 'You will receive an email when the group own approves your request!' });
   return res.redirect('/');
+
+  function sendPendingRequestEmailToCreator(creator, requestingUser) {
+    var mailOptions = {
+     to: creator.email,
+     from: "RacePool@IMS.org",
+     subject: 'A new user wants to join your Race Pool',
+     text: 'Hello, ' + creator.profile.name + '!\n\n' + requestingUser.profile.name +
+        ' is requesting to join your RacePool. Please login to the site to confirm or deny their request!\n\nThanks and happy racing!\nRace Pool and the IMS'
+   };
+
+   transporter.sendMail(mailOptions, function(err) {
+     if (err) {
+       console.log('ERROR sending email: ', err);
+     }
+   });
+  }
 };
 
 exports.allowUserToJoin = function(req, res) {
@@ -198,12 +229,27 @@ exports.allowUserToJoin = function(req, res) {
 
       group.save();
 
+      sendAcceptanceEmail(user, group);
       req.flash('success', { msg: 'Successfully added ' + user.profile.name + ' to the group!' });
       return res.redirect('/group/' + groupId);
 
-      //TODO: email the user that they were accepted
     });
   });
+
+  function sendAcceptanceEmail(user, group) {
+    var mailOptions = {
+      to: user.email,
+      from: "RacePool@IMS.org",
+      subject: 'Race Pool - You have been accepted to join ' + group.name,
+      text: 'Hello, ' + user.profile.name + '!\n\n' + 'You have been accepted into the group ' + group.name + '! Good luck!\n\nThanks and happy racing!\nRace Pool and the IMS'
+    };
+
+    transporter.sendMail(mailOptions, function(err) {
+      if (err) {
+        console.log('ERROR sending email: ', err);
+      }
+    });
+  }
 };
 
 exports.rejectUser = function(req, res) {
