@@ -75,9 +75,17 @@ footer {
   color: white;
 }
 
+.red {
+  color: red;
+}
+
 .no-btn {
   background: transparent;
   border: none !important;
   color: black;
   box-shadow: none;
+}
+
+.no-padding {
+  padding: 0 0 0 0;
 }

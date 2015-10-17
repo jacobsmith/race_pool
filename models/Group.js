@@ -10,7 +10,8 @@ var groupSchema = new mongoose.Schema({
   thirdPlaceWin: String,
   lastCarRunning: String,
   closed: Boolean,
-  creatorId: String
+  creatorId: String,
+  requests: Array // Array of userIds as strings of those wanting to join
 });
 
 groupSchema.virtual('prizes').get(function() {

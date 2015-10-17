@@ -28,16 +28,18 @@ block content
         input(type='hidden', name='_csrf', value=_csrf)
         button.pull-right.btn.btn-default(type="submit") Pick Driver! (Costs: #{group.wager})
     else
-      hr
       h5 You will receive an email when the group owner has closed the group and then you can pick your drivers!
       hr
       
     if !group.closed
-      button.btn.btn-primary(onclick="toggleShareLinks()") Invite your friends!
-    
-    hr
-      
+      if currentUserIsInGroup
+        button.btn.btn-primary(onclick="toggleShareLinks()") Invite your friends!
+      else
+        form.form-horizontal(action='/group/#{group.id}/join/#{currentUserId}', method='GET')
+          button.btn.btn-primary(type="submit") Request to Join
+  
     div#share-links(style="display:none;")
+      hr
       div.panel.panel-default
         div.panel-heading
           h4 Share on social media!
@@ -48,6 +50,21 @@ block content
               input.form-control#url(name="url", value="#{groupUrl}")
               span.input-group-addon#copy-to-clipboard(data-clipboard-target="#url")
                 i.fa.fa-clone
+
+    if (group.creatorId === currentUserId && requestingUsers.length > 0)
+      hr
+      h4 People requesting to join your group
+      ul.list-group
+        - for user in requestingUsers
+          li.list-group-item #{user.profile.name}
+              div.col-xs-4.col-sm-3.pull-right
+                form.form-horizontal.pull-right(action='/group/#{group.id}/reject/#{user._id}', method='GET')
+                  button.no-padding.btn.no-btn(type="submit")
+                    i.fa.fa-lg.fa-times.red
+              form.form-horizontal.pull-right(action='/group/#{group.id}/allow/#{user._id}', method='GET')
+                button.no-padding.btn.no-btn(type="submit")
+                  i.fa.fa-lg.fa-check.green
+
 
     h4 Prizes
     ul.list-group

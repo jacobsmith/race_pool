@@ -134,6 +134,9 @@ app.get('/group/:groupId', groupController.viewGroup);
 app.get('/group/:groupId/close', groupController.closeGroup);
 app.get('/group/:groupId/pickDriver', groupController.pickDriver);
 app.get('/group/:groupId/standings', groupController.getCurrentStandings);
+app.get('/group/:groupId/join/:userId', groupController.requestToJoin);
+app.get('/group/:groupId/allow/:userId', groupController.allowUserToJoin);
+app.get('/group/:groupId/reject/:userId', groupController.rejectUser);
 
 app.get('/race/startingPositions', raceStatus.getStartingPositions);
 

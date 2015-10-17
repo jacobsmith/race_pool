@@ -168,6 +168,63 @@ exports.joinGroup = function(req, res) {
   });
 };
 
+exports.requestToJoin = function(req, res) {
+  var groupId = req.params.groupId;
+  var userId = req.params.userId;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    if (group.requests.indexOf(userId) == -1) {
+      group.requests.push(userId);
+      group.save();
+    }
+  });
+
+  // TODO: email group creator someone wants in!
+
+  req.flash('success', { msg: 'You will receive an email when the group own approves your request!' });
+  return res.redirect('/');
+};
+
+exports.allowUserToJoin = function(req, res) {
+  var groupId = req.params.groupId;
+  var userId = req.params.userId;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    User.findOne({_id: userId}).exec(function(err, user) {
+      group.users.push(user);
+
+      var filteredRequests = _.filter(group.requests, function(r) { return r != userId; });
+      group.requests = filteredRequests;
+
+      group.save();
+
+      req.flash('success', { msg: 'Successfully added ' + user.profile.name + ' to the group!' });
+      return res.redirect('/group/' + groupId);
+
+      //TODO: email the user that they were accepted
+    });
+  });
+};
+
+exports.rejectUser = function(req, res) {
+  var groupId = req.params.groupId;
+  var userId = req.params.userId;
+
+  Group.findOne({_id: groupId}).exec(function(err, group) {
+    User.findOne({_id: userId}).exec(function(err, user) {
+
+      var requests = group.requests;
+      var filteredRequests = _.filter(requests, function(r) { return r != userId; });
+      group.requests = filteredRequests;
+      group.save();
+
+      req.flash('info', { msg: 'Denied request from ' + user.profile.name + '.' });
+      return res.redirect('/group/' + groupId);
+
+    });
+  });
+};
+
 exports.viewGroup = function(req, res) {
   var groupId = req.params.groupId;
   var currentUserId = req.user._id.toString();
@@ -175,7 +232,17 @@ exports.viewGroup = function(req, res) {
   var groupUrl = req.protocol + '://' + req.get('host') + '/group/' + groupId;
 
   Group.findOne({_id: groupId}).exec(function(err, group) {
-    res.render('group/view', {group: group, currentUserId: currentUserId, groupUrl: groupUrl});
+    currentUserIsInGroup = _.map(group.users, function(u) { return u._id.toString(); }).indexOf(currentUserId) > -1;
+
+    User.find({ _id: { $in: group.requests } }).exec(function(err, users) {
+      res.render('group/view', {
+        group: group,
+        currentUserId: currentUserId,
+        groupUrl: groupUrl,
+        currentUserIsInGroup: currentUserIsInGroup,
+        requestingUsers: users
+      });
+    });
   });
 };
 
