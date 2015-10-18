@@ -1,0 +1,12 @@
+span#channel {
+visibility: hidden;
+word-spacing:-999px;
+letter-spacing: -999px;
+}
+
+span#channel:after {
+content: "Chat with your group!";
+visibility: visible;
+word-spacing:normal;
+letter-spacing:normal;
+}

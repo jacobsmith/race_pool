@@ -17,6 +17,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+
 exports.getGroups = function(req, res) {
   currentUser = req.user;
   console.log('currentUser: ', currentUser);
@@ -276,6 +277,7 @@ exports.viewGroup = function(req, res) {
   var currentUserId = req.user._id.toString();
 
   var groupUrl = req.protocol + '://' + req.get('host') + '/group/' + groupId;
+  var appUrl = req.protocol + '://' + req.get('host');
 
   Group.findOne({_id: groupId}).exec(function(err, group) {
     currentUserIsInGroup = _.map(group.users, function(u) { return u._id.toString(); }).indexOf(currentUserId) > -1;
@@ -286,7 +288,8 @@ exports.viewGroup = function(req, res) {
         currentUserId: currentUserId,
         groupUrl: groupUrl,
         currentUserIsInGroup: currentUserIsInGroup,
-        requestingUsers: users
+        requestingUsers: users,
+        appUrl: appUrl
       });
     });
   });
