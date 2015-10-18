@@ -17,6 +17,19 @@ exports.getLogin = function(req, res) {
   });
 };
 
+exports.lookup = function(req, res) {
+  var query = req.query.query;
+
+  User.find({ "profile.name": {'$regex': query }}).exec(function(err, user) {
+    if (err) {
+      console.log('ERROR: ', err);
+    }
+
+    var users = _.uniq(_.map(user, function(u) { return {value: u.profile.name + ' (' + u.email + ')', data: u._id.toString() }; }));
+    return res.json({ query: query, suggestions: users});
+  });
+};
+
 /**
  * POST /login
  * Sign in using email and password.

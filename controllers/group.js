@@ -20,7 +20,6 @@ var transporter = nodemailer.createTransport({
 
 exports.getGroups = function(req, res) {
   currentUser = req.user;
-  console.log('currentUser: ', currentUser);
   Group.find({ users: { $all: currentUser }}).exec().then(function (groups) {
     res.render('group/index', {groups: groups});
   });

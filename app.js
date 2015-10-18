@@ -31,6 +31,7 @@ var groupController = require('./controllers/group');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
 var raceStatus = require('./controllers/raceStatus');
+var sideBetsController = require('./controllers/sideBets');
 
 /**
  * API keys and Passport configuration.
@@ -140,6 +141,11 @@ app.get('/group/:groupId/reject/:userId', groupController.rejectUser);
 
 app.get('/race/startingPositions', raceStatus.getStartingPositions);
 
+app.get('/sideBets', sideBetsController.viewAll);
+app.get('/sideBets/new', sideBetsController.newBet);
+app.post('/sideBets/new', sideBetsController.makeNewBet);
+
+app.get('/lookup', userController.lookup);
 /**
  * API examples routes.
  */

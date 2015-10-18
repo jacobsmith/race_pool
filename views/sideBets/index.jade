@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  h3 Your Side Bets
+    a(href="/sideBets/new")
+      button.pull-right.btn.btn-default Place new side bet
+  if sideBets.length === 0
+    p Side bets are bets between you and one other person. Some examples may be:
+      ul
+        li First Driver out of the race
+        li Driver to make the first Pit Stop
+        li Driver leading at the Half Way Point
+        li Average Race Speed
+        li Fastest Lap Speed
+        li Total number of people in attendance
+        li Anything else you wish to place a friendly wager on!
+  else
+    ul 
+      - for sideBet in sideBets
+        li #{sideBet.challengerObj.profile.name} challenges #{sideBet.challengeeObj.profile.name } to #{sideBet._doc.name} for #{sideBet._doc.wager}

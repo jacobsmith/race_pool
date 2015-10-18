@@ -1,0 +1,28 @@
+extends ../layout
+
+
+block content
+  form.form-horizontal(method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group
+      label.col-sm-3.control-label(for='name') Name of Bet
+      .col-sm-7
+        input.form-control(type='text', name='name', id='name', placeholder='Ex. Average lap speed', autofocus=true)
+    .form-group
+      label.col-sm-3.control-label(for='bet') Your bet
+      .col-sm-7
+        input.form-control(type='text', name='bet', id='bet', placeholder='> 200 mph', autofocus=true)
+    .form-group
+      label.col-sm-3.control-label(for='wager') Wager
+      .col-sm-7
+        input.form-control(type='text', name='wager', id='wager', placeholder='Wager', autofocus=true)
+    .form-group
+      label.col-sm-3.control-label(for='challenge') Who do you want to challenge? 
+      .col-sm-7
+        input.form-control(type='text', id='challenge', placeholder='Search by Name or Email', autofocus=true)
+        input(type="hidden", name="challenge_id", id="challenge_id")
+    .form-group
+      .col-sm-offset-3.col-sm-7
+        button.col-sm-3.btn.btn-primary(type='submit')
+          i.fa.fa-user
+          | Create Side Bet
