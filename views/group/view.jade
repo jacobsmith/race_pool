@@ -36,10 +36,13 @@ block content
           form.form-horizontal(action='/group/#{group.id}/close' id='close-group-form', method='GET')
             input(type='hidden', name='_csrf', value=_csrf)
             button.pull-right.btn.btn-default(type="submit") Close Group
-        else if group.closed
+        else if group.closed && group.maxEntries > driversChosen
           form.form-horizontal(action='/group/#{group.id}/pickDriver' id='close-group-form', method='GET')
             input(type='hidden', name='_csrf', value=_csrf)
-            button.pull-right.btn.btn-default(type="submit") Pick Driver! (Costs: #{group.wager})
+            button.pull-right.btn.btn-default(type="submit") Pick Driver! (Costs: #{group.wager}) [ You have #{group.maxEntries - driversChosen} picks left]
+        else if group.closed
+          h5 You have picked all of your drivers. Get ready to cheer them on during the race!
+          hr
         else
           h5 You will receive an email when the group owner has closed the group and then you can pick your drivers!
           hr

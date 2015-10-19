@@ -28,6 +28,10 @@ block content
       .col-sm-7
         input.form-control(type='text', name='lastCarRunning', id='last-car-running', placeholder='Last Car Running Prize', autofocus=true)
     .form-group
+      label.col-sm-3.control-label(for='maxEntries') Maximum number of entries (per person)
+      .col-sm-7
+        input.form-control(type='number', name='maxEntries', id='max-entries', placeholder='Max Entries per person', autofocus=true, min="1", max="17")
+    .form-group
       .col-sm-offset-3.col-sm-7
         button.col-sm-3.btn.btn-primary(type='submit')
           i.fa.fa-user

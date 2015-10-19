@@ -12,7 +12,7 @@ block content
             .ul
               - for user in group.users
                 .li.list-group-item
-                  = JSON.stringify(user)
+                  = user.profile.name
     - else
       br
       p It looks like your the first of your friends to join Race Pool. Go ahead and create a group to invite your friends to join you!

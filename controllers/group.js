@@ -140,9 +140,7 @@ exports.closeGroup = function(req, res) {
       return res.redirect('/group');
     }
 
-    console.log('user: ', user);
-
-    if (group.creatorId != user) {
+    if (group.creatorId != user._id.toString()) {
       req.flash('errors', { msg: 'Only the creator of a group can choose to close it.'});
       return res.redirect('/group');
     }
@@ -282,13 +280,26 @@ exports.viewGroup = function(req, res) {
     currentUserIsInGroup = _.map(group.users, function(u) { return u._id.toString(); }).indexOf(currentUserId) > -1;
 
     User.find({ _id: { $in: group.requests } }).exec(function(err, users) {
-      res.render('group/view', {
-        group: group,
-        currentUserId: currentUserId,
-        groupUrl: groupUrl,
-        currentUserIsInGroup: currentUserIsInGroup,
-        requestingUsers: users,
-        appUrl: appUrl
+
+      GroupUserDriver.find({group: group, user: req.user}).exec(function(err, groupUserDrivers) {
+        if (err) {
+          console.log('ERROR: ', err);
+        } else {
+          console.log('LENGHT: ', groupUserDrivers.length);
+          console.log('group max', group.maxEntries);
+        }
+
+
+        res.render('group/view', {
+          group: group,
+          currentUserId: currentUserId,
+          groupUrl: groupUrl,
+          currentUserIsInGroup: currentUserIsInGroup,
+          requestingUsers: users,
+          appUrl: appUrl,
+          driversChosen: groupUserDrivers.length
+        });
+
       });
     });
   });
@@ -304,6 +315,8 @@ exports.postGroup = function(req, res) {
     return res.redirect('back');
   }
 
+  console.log(req.body.maxEntries);
+
   User.findOne({_id: req.user.id}).exec(function(err, user) {
     console.log('creating with user: ', user);
     if (user) {
@@ -315,7 +328,8 @@ exports.postGroup = function(req, res) {
         thirdPlaceWin: req.body.thirdPlaceWin,
         lastCarRunning: req.body.lastCarRunning,
         users: [user],
-        creatorId: user._id.toString()
+        creatorId: user._id.toString(),
+        maxEntries: parseInt(req.body.maxEntries)
       });
 
       group.save(function(err, group) {

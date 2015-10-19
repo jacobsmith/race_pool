@@ -11,7 +11,8 @@ var groupSchema = new mongoose.Schema({
   lastCarRunning: String,
   closed: Boolean,
   creatorId: String,
-  requests: Array // Array of userIds as strings of those wanting to join
+  requests: Array, // Array of userIds as strings of those wanting to join
+  maxEntries: Number
 });
 
 groupSchema.virtual('prizes').get(function() {
